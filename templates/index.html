@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ürün Tanıma Sistemi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .upload-form {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            width: 300px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .result {
+            margin-top: 30px;
+        }
+        .result h2 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .result img {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .product-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .product-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .product-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .product-list li:last-child {
+            border-bottom: none;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            justify-content: center;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        .shelf-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .shelf-section h4 {
+            color: #2c5aa0;
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+        .count {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .empty-shelf {
+            color: #6c757d;
+            font-style: italic;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Ürün Tanıma Sistemi</h1>
+        
+        <div class="upload-form">
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required>
+                <br><br>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" name="enhance" id="enhance">
+                    <label for="enhance">✨ Kontrast İyileştirme</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" name="use_ensemble" id="use_ensemble">
+                    <label for="use_ensemble">🎯 Ensemble Tahmin (Daha Doğru)</label>
+                </div>
+                
+
+                
+                <br>
+                <button type="submit">🔍 Analiz Et</button>
+            </form>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            <p>❌ {{ error }}</p>
+        </div>
+        {% endif %}
+
+        {% if result is defined %}
+        <div class="result">
+            <h2>📊 Analiz Sonuçları</h2>
+            
+            <div class="product-list">
+                <h3>📦 Toplam Ürün: {{ toplam_urun }}</h3>
+                
+                {% for raf in result %}
+                <div class="shelf-section">
+                    <h4>🛒 {{ raf.raf_no }}. Raf ({{ raf.urunler.values() | sum }} adet)</h4>
+                    {% if raf.urunler %}
+                    <ul>
+                        {% for isim, adet in raf.urunler.items() %}
+                        <li>
+                            <strong>{{ isim.replace('_', ' ').title() }}</strong>: 
+                            <span class="count">{{ adet }} adet</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="empty-shelf">Bu rafta ürün tespit edilemedi</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <h3>🖼️ İşlenmiş Görsel:</h3>
+            <img src="{{ image_url }}" alt="Analiz edilmiş görsel">
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+
